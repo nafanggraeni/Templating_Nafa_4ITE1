@@ -1,43 +1,47 @@
 <?= $this->extend('base') ?>
-
 <?= $this->section('content') ?>
-<div class="container">
-    <div class="row justify-content-center mt-4">
-        <div class="card shadow">
-            <div class="card-header">
-                <h4>Add Data</h4>
-            </div>
-            <div class="card-body">
-                <form action="/product/create" method="post">
-                    <div class="form-group">
-                        <label for="name">Product Name</label>
-                        <input type="text" class="form-control" id="name" placeholder="Input product name" name="name" />
-                    </div>
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="mb-4">Create new product</h5>
 
-                    <div class="form-group">
-                        <label for="stock">Stock</label>
-                        <input type="number" class="form-control" min="1" id="stock" placeholder="Input product stock" name="stock" />
-                    </div>
-                    <div class="form-group">
-                        <label for="price">Price</label>
-                        <input type="number" min="0" id="price" class="form-control" placeholder="Input product price" name="price" />
-                    </div>
+            <form action="/product" method="post" enctype="multipart/form-data">
 
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <select class="form-control" name="category" id="category">
-                            <option value="utilities">Utilities</option>
-                            <option value="Make_up">Make up</option>
-                            <option value="Skincare">Skincare</option>
-                        </select>
-                    </div>
+                <div class="form-group">
+                    <label for="example-product-name">Product Name</label>
+                    <input type="text" class="form-control" id="example-product-name" aria-describedby="emailHelp" 
+                        placeholder="Enter product name" required name="name">
+                </div>
 
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
+                <div class="form-group">
+                    <label for="example-product-stock">Stock</label>
+                    <input type="number" min="1" class="form-control" id="example-product-stock" aria-describedby="emailHelp" 
+                        placeholder="Enter product stock" required name="stock">
+                </div>
+
+                <div class="form-group">
+                    <label for="example-product-price">Price</label>
+                    <input type="number" min="1" class="form-control" id="example-product-price" aria-describedby="emailHelp" 
+                        placeholder="Enter product price" required name="price">
+                </div>
+
+                <div class="form-group">
+                    <label for="example-product-category">Category</label>
+                    <select class="form-control" name="category" id="example-product-category">
+                        <option value="utilities">Utilities</option>
+                        <option value="food_and_beverages"> Food & Beverages</option>
+                        <option value="books">Books</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="example-product-photo">Photo</label>
+                    <input type="file" class="form-control" id="example-product-photo" aria-describedby="photoHelp" name="photo">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
         </div>
     </div>
 </div>
-<div class="text-center p-3" ;">
-  </div>
 <?= $this->endSection() ?>

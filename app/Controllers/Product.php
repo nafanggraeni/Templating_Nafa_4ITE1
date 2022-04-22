@@ -1,31 +1,15 @@
 <?php
+
 namespace App\Controllers;
 
 use CodeIgniter\RESTful\ResourceController;
+use App\Models\ProductModel; 
 
 class Product extends ResourceController
 {
-    protected $session;
-
-    private $products = [
-        [
-            "id" => "623b476dc4f96", 
-            "name" => "Odol",
-            "category" => "utilities",
-            "stock" => 200,
-            "price" => 5000
-        ]
-    ];
-
     public function __construct() {
-        $this->session = \Config\Services::session();
-        $this->session->start();
-
-        if(!$this->session->get('products')) {
-            $this->session->set('products', $this->products);
-        }
+        $this->productModel = new ProductModel();
     }
-
 
     /**
      * Return an array of resource objects, themselves in array format
@@ -34,8 +18,11 @@ class Product extends ResourceController
      */
     public function index()
     {
+        $products = $this->productModel->paginate(1, 'products');
+
         $payload = [
-            "products" => $this->session->get('products')
+            "products" => $products,
+            "pager" => $this->productModel->pager
         ];
 
         echo view('product/index', $payload);
@@ -68,23 +55,32 @@ class Product extends ResourceController
      */
     public function create()
     {
+
+        $fileName = "";
+
+        $photo = $this->request->getFile('photo');
+
+        if ($photo->getError() ==4) {
+            $fileName =('default.png');
+            
+        }
         
-        $products = $this->session->get('products');
+        else{
+            $fileName = $photo->getRandomName();
+            $photo->move('photos', $fileName);
+        }
 
         $payload = [
-            "id" => uniqid(),
             "name" => $this->request->getPost('name'),
             "stock" => (int) $this->request->getPost('stock'),
             "price" => (int) $this->request->getPost('price'),
             "category" => $this->request->getPost('category'),
+            "photo" => $fileName, // Kita simpan nama filenya saja
         ];
 
-        array_push($products, $payload);
-
-        $this->session->set('products', $products);
+        $this->productModel->insert($payload);
         return redirect()->to('/product');
     }
-
     /**
      * Return the editable properties of a resource object
      *
@@ -92,22 +88,15 @@ class Product extends ResourceController
      */
     public function edit($id = null)
     {
-        $products = $this->session->get('products');
-
-        $data = null;
-
-        foreach ($products as $item) {
-            if ($item['id'] == $id) {
-                $data = $item;
-            }
-        }
-
-        if (!$data) {
-            throw new \Exception("Data not found!");
+        $product = $this->productModel->find($id);
+        
+        if (!$product) {
+            throw new \Exception("Data not found!");   
         }
         
-        echo view('product/edit', ["data" => $data]);
+        echo view('product/edit', ["data" => $product]);
     }
+
 
     /**
      * Add or update a model resource, from "posted" properties
@@ -116,30 +105,30 @@ class Product extends ResourceController
      */
     public function update($id = null)
     {
-        $products = $this->session->get('products');
-        $data = null;
+        $fileName = "";
 
-        $_new_products = [];
+        $photo = $this->request->getFile('photo');
 
-        foreach ($products as $item) {
-            if ($item['id'] == $id) {
-
-                $item['name'] = $this->request->getPost('name');
-                $item['category'] = $this->request->getPost('category');
-                $item['stock'] = (int) $this->request->getPost('stock');
-                $item['price'] = (int) $this->request->getPost('price');
-                
-                $data = $item;
-            }
-
-            array_push($_new_products, $item);
+        if ($photo->getError() ==4) {
+            $fileName = $this->request->getVar('oldphoto');
+            
+        }
+        
+        else{
+            $fileName = $photo->getRandomName();
+            $photo->move('photos', $fileName);
+            unlink('photos/' .$this->request->getVar('oldphoto'));
         }
 
-        if (!$data) {
-            throw new \Exception("Data not found!");
-        }
+        $payload = [
+            "name" => $this->request->getPost('name'),
+            "stock" => (int) $this->request->getPost('stock'),
+            "price" => (int) $this->request->getPost('price'),
+            "category" => $this->request->getPost('category'),
+            "photo" => $fileName // Kita simpan nama filenya saja
+        ];
 
-        $this->session->set('products', $_new_products);
+        $this->productModel->update($id, $payload);
         return redirect()->to('/product');
     }
 
@@ -150,25 +139,9 @@ class Product extends ResourceController
      */
     public function delete($id = null)
     {
-        $products = $this->session->get('products');
-        $data = null;
-
-        $_new_products = [];
-
-        foreach ($products as $item) {
-            if ($item['id'] == $id) {
-                $data = $item;
-                continue;
-            }
-
-            array_push($_new_products, $item);
-        }
-
-        if (!$data) {
-            throw new \Exception("Data not found!");
-        }
-
-        $this->session->set('products', $_new_products);
+        $products = $this->productModel->find($id);
+        unlink('photos/' .$products['photo']);
+        $this->productModel->delete($id);
         return redirect()->to('/product');
     }
 }

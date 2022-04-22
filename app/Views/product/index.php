@@ -1,57 +1,53 @@
 <?= $this->extend('base') ?>
-
 <?= $this->section('content') ?>
-<div class="container">
-    <div class="card mt-4 shadow">
-        <div class="card-header">
-            <a href="/product/new" class="btn btn-denger"> <i class="fas fa-plus"></i> Add new product</a>
-        </div>
-        <div class="card-body">
-        <table class="table table-striped">
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="mb-4">Hello <?= session('name') ?> </h5>
+
+            <h5 class="mb-4">Daftar Produk</h5>
+
+            <table class="table table-hover ">
                 <thead>
                     <tr>
-                        <td>No.</td>
-                        <td>Name</td>
-                        <td>Stock</td>
-                        <td>Price</td>
-                        <td>Category</td>
-                        <td>Action</td>
+                        <th scope="col ">ID</th>
+                        <th scope="col ">Product Name</th>
+                        <th scope="col ">Stock</th>
+                        <th scope="col ">Price</th>
+                        <th scope="col ">Category</th>
+                        <th scope="col ">Photo</th>
+                        <th scope="col ">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-
                     <?php $no = 0; ?>
-                    <?php foreach ($products as $item) : ?>
-                        <tr>
-                            <td><?= $no += 1; ?></td>
-                            <td><?= $item['name'] ?></td>
-                            <td><?= $item['stock'] ?></td>
-                            <td><?= $item['price'] ?></td>
-                            <td><?= $item['category'] ?></td>
-                            <td>
-                                <div class="d-flex">
-                                    <a class="btn btn-success" style="height: 35px;margin-right:10px" href="/product/<?= $item['id'] ?>/edit"><i class="fas fa-pen"></i></a>
-                                    <form action="/product/<?= $item['id'] ?>" method="post" onsubmit="return confirm(`Are you sure?`)">
-                                        <input type="hidden" name="_method" value="delete" />
-                                        <button type="submit" class="btn btn-primary" style="height: 35px;"><i class="fas fa-eraser"></i></button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
+                    <?php foreach ($products as $item): ?>
+                    <tr>
+                        <td><?= $no += 1; ?></td>
+                        <td><?= $item['name'] ?></td>
+                        <td><?= $item['stock'] ?></td>
+                        <td><?= $item['price'] ?></td>
+                        <td><?= $item['category'] ?></td>
+                        <td><img src="/photos/<?= $item['photo'] ?>" alt="" width=100 height=100></td>
+                        <td>
+                            <div class="btn-group " role="group " aria-label="Basic example ">
+                                <form action="/product/<?= $item['id'] ?>" method="POST" onsubmit="return confirm(`Are you sure?`)">
+                                    <a href="/product/<?= $item['id'] ?>/edit" class="btn btn-info text-white "><i class='bx bx-pencil'></i></a>
+                                    <input type="hidden" name="_method" value="DELETE" />
+                                    <button class="btn btn-danger text-white" type="submit">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
                     <?php endforeach ?>
-                     
-                    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                        <a class="navbar-brand" href="#">Welcome To My list</a>
-                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                         </button>
-                         
                 </tbody>
             </table>
         </div>
+        <div class="col-12">
+            <?= $pager->links('products', 'custom_pagination') ?>
+        </div>
     </div>
 </div>
-<div class="text-center p-3" ;">
-    
-  </div>
 <?= $this->endSection() ?>
